@@ -57,7 +57,7 @@ class SocketInterface():
         while self.clientsocket.recv(2) != 'ok':
             time.sleep(0.01)
 
-    def activity(self, name, idx):
+    def activity(self, name, idx=None):
         msg = {'idx': idx, 'task': name}
         s_msg = json.dumps(msg)
         self.socket_send(s_msg)
@@ -67,8 +67,35 @@ class SocketInterface():
     def socket_send(self, msg):
         self.clientsocket.send(msg)
 
+
+
+def playActor():
+    soI.say('Agora vou te mostrar minhas habilidades como ator. Primeiro, mostre cada uma das emoções contidas no papel que te entregagram, na ordem em que preferir. Doga OK robô quando estiver pronto.')
+    raw_input('Press enter to start emotion recognition')
+    soI.activity(name='actor')
+
+    emojis = [':)', ':(',  '>:', ':&', ':!', ':o', ':O', '.']
+
+    soI.say("Agora é a sua vez de descobrir. Tente dizer qual expressão eu estou mostrando")
+    soI.say("Está pronto?")
+    soI.say("Anote qual emoção você acha que é e me diga quando estiver pronto para a próxima.")
+
+
+    for i,emoji in enumerate(emojis):
+        #display_emotion(robot, max(core.emotions, key=core.emotions.get))
+        soI.say("Emoção número " + str(i+1))
+        soI.say(emoji)
+        soI.say("Pronto?")
+        raw_input("GO!")
+
+
+
+
 def main():
     soI = SocketInterface()
+    
+    playActor()
+    exit()
 
     #----- move stuff    
     soI.move(ang_z=1.0)
@@ -143,8 +170,14 @@ def main():
     #exercicio.play(soI) 
     jkp.play( soI, None, 3 )
 
+
+    soI.say("Agora vou te mostrar minhas habilidades como ator. Primeiro mostre cada uma das emocoes contidas no papel que te entregaram, na ordem que preferir. Diga Ok robo quanto estiver pronto")
+    raw_input("Press enter to start emotion recognition")
+
     attention = disattention.Th(1)
     attention.start()
+
+    soI.emotions()
     #emo.play(soI, attention)
     attention._end_classification()
 

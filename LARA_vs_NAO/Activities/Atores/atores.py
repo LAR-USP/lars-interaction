@@ -62,6 +62,7 @@ def play(robot, att):
     #pessoa adivinha emoções do nao
     #robot.say("Agora e a sua vez de descobrir. Tente dizer qual expressao eu estou mostrando")
 
+    """
     emojis = [':)', ':(',  '>:', ':&', ':!', ':o', ':O', '.']
 
 
@@ -79,7 +80,7 @@ def play(robot, att):
         robot.say(emoji)
         robot.say("Pronto?")
         raw_input("GO!")
-        
+    """ 
 
     
     #return 1       

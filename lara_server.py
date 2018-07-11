@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 #!/usr/bin/env python
 import os
 import cv2
@@ -6,11 +7,12 @@ import rospy
 from std_msgs.msg import String
 from geometry_msgs.msg import Twist
 import subprocess
-
+import disattention
+from Modules import vars as core
 
 # SOCKET
 import socket
-
+import random
 import numpy as np
 import time
 import json
@@ -70,8 +72,8 @@ class App(QWidget):
 #            self.initShelf()
         if task == 'exercise':
             self.initExercise(msg['idx'])
-#        elif task == 'actor':
-#            self.initActor(msg['idx'])
+        elif task == 'actor':
+            self.initEmotion()
         elif task == 'jokenpo':
             self.initJoKenPo(msg['idx'])
         elif task == 'speak':
@@ -128,6 +130,47 @@ class App(QWidget):
         vel_msg.angular.z = msg.get('angular_z', 0)
 
         self.velocity_pub.publish(vel_msg)
+
+    def initEmotion(self):
+        att = disattention.Th(1)
+        att.start()
+
+        emotions_list = ['Alegria', 'Triste', 'Raiva', 'Nojo',
+        'Surpresa', 'Medo', 'Neutral']
+        
+        rand_emo = random.randint(0,6)
+            
+        for i in range(0,6):
+           print('ESTOU AQUIIIII') 
+           att._continue()
+           print(core.emotions)
+           #print "Faça para mim a expressão facial de" , emotions_list[i]
+           #print "Agora vou te mostrar minhas habilidades como ator. Mostre uma expressão entre Alegria, Tristeza, Raiva, Nojo, Surpresa ou Medo que eu vou imitar"
+           #Reconhecimento de emoções
+           # Intervalo de tempo I, escolhe a emoção amis detectada 
+           time.sleep(4)
+           att._halt()
+
+           core.emotions['neutral']=0
+                
+           print "Mais detectada",  max(core.emotions, key=core.emotions.get)
+           emo_result = core.translated_emotions[max(core.emotions, key=core.emotions.get)]
+                
+           print( "Traduzida", emo_result)
+     #      robot.say("A expressão que eu detectei foi, " + emo_result)
+            
+           if(i < 5):
+               self.speak("Agora me mostre outra emoção")
+           else:
+               self.speak("Perfeito, estou aprendendo as emoções")
+           
+           print core.emotions
+           core.clear_emo_variables()
+
+           print "Emo:", emotions_list[i]
+           print core.emotions
+
+        att._end_classification()
 
     def showStandby(self):
     #    self.imgLabel.hide()
