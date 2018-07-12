@@ -6,7 +6,7 @@ import time
 
 #from Modules import dialog
 from Modules import vars as core
-from Modules import disattention
+#from Modules import disattention
 #from Modules import vision
 #import os
 #import sys
@@ -39,7 +39,7 @@ from Activities.Prateleira  import shelf
 class SocketInterface():
     def __init__(self):
         self.clientsocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.clientsocket.connect(('localhost', 8108))
+        self.clientsocket.connect(('172.26.146.60', 8111))
     
     def say(self, txt):
         msg = {'text': txt, 'task': 'speak'}
@@ -69,49 +69,57 @@ class SocketInterface():
 
 
 
-def playActor():
-    soI.say('Agora vou te mostrar minhas habilidades como ator. Primeiro, mostre cada uma das emoções contidas no papel que te entregagram, na ordem em que preferir. Doga OK robô quando estiver pronto.')
+def playActor( soI ):
+    soI.say('Agora vou te mostrar minhas habilidades como atriz')
+    soI.say('Primeiro, mostre cada uma das emoções contidas no papel que te entregagram, na ordem em que preferir')
+    soI.say('Diga OK robô quando estiver pronto')
     raw_input('Press enter to start emotion recognition')
     soI.activity(name='actor')
 
-    emojis = [':)', ':(',  '>:', ':&', ':!', ':o', ':O', '.']
+    emojis = [':)', ':(',  '>:', ':&', ':!', ':O']
 
-    soI.say("Agora é a sua vez de descobrir. Tente dizer qual expressão eu estou mostrando")
-    soI.say("Está pronto?")
-    soI.say("Anote qual emoção você acha que é e me diga quando estiver pronto para a próxima.")
+    soI.say('Agora é a sua vez de descobrir, tente dizer qual expressão eu estou mostrando')
+    soI.say('Anote qual emoção você acha que é e me diga quando estiver pronto para a próxima')
+    soI.say('Está pronto?')
+    raw_input('OK')
 
 
     for i,emoji in enumerate(emojis):
+        print(emoji)
         #display_emotion(robot, max(core.emotions, key=core.emotions.get))
-        soI.say("Emoção número " + str(i+1))
+        soI.say('Emoção número ' + str(i+1))
         soI.say(emoji)
-        soI.say("Pronto?")
-        raw_input("GO!")
-
+        time.sleep(2)
+        soI.say('Pronto?')
+        raw_input('GO!')
+    soI.say('.')
+    time.sleep(2)
 
 
 
 def main():
+    
     soI = SocketInterface()
     
-    playActor()
-    exit()
 
     #----- move stuff    
     soI.move(ang_z=1.0)
     time.sleep(1.5)
     soI.move()
+    time.sleep(1.0)
     soI.move(ang_z=-1.0)
     time.sleep(3.0)
     soI.move()
+    time.sleep(1.0)
     soI.move(ang_z=1.0)
     time.sleep(1.5)
     soI.move()
-
-    prefferences = False
+    
+    prefferences = True
 
     userModel = fileHelper.fileHelper()
-    soI.say(u'Boa tarde, humano! Meu nome é Lara. E o você, qual é seu nome?')
+    soI.say('Boa tarde, humano! Meu nome é Lara.')
+    soI.say('E o você, qual é seu nome?')
     nome = raw_input()
     soI.say("Que nome top!")
     
@@ -141,8 +149,9 @@ def main():
         userModel.join()
         print('Joint threads!')
 
-    soI.say(" Vamos fazer uma série de atividades agora! Está preparado? Vamos lá")
     
+    soI.say('Vamos fazer uma série de atividades agora')
+    soI.say('Está preparado? Vamos lá!')
    
     # Change Activities Orders: 
     drugs.play(soI)
@@ -150,43 +159,42 @@ def main():
     userModel.join()
     userModel.close()
 
-    try:
-        esporte = u'Sobre seu esporte preferido: \n{}'.format(
-            userModel.searchFile([preferences['esporte favorito'].encode('utf-8')])).encode('utf-8')
-        comida = u'\nSobre sua comida preferida: \n{}'.format(
-            userModel.searchFile([preferences['comida favorita'].encode('utf-8')])).encode('utf-8')
-        musica = u'\nSobre sua música preferida: \n{}'.format(
-            userModel.searchFile([preferences['musica favorita'].encode('utf-8')])).encode('utf-8')
-    
-    except Exception as e:
-        print(e)
-
-    #soI.say( esporte )
-    
-    #shelf.play(soI)
     if prefferences:
-        soI.say( comida )
-    
-    #exercicio.play(soI) 
+        try:
+            soI.say( u'Sobre seu esporte preferido: \n{}'.format(
+                userModel.searchFile([preferences['esporte favorito'].encode('utf-8')])).encode('utf-8') )
+        except Exception as e:
+            print(e)
+ 
+    soI.move(ang_z=1.0)
+    time.sleep(1.9)
+    soI.move()
+    shelf.play(soI)
+    soI.move(ang_z=-1.0)
+    time.sleep(1.9)
+    soI.move()
+
+    if prefferences:
+        try:
+            soI.say( u'\nSobre sua comida preferida: \n{}'.format(
+                userModel.searchFile([preferences['comida favorita'].encode('utf-8')])).encode('utf-8') )
+        except Exception as e:
+            print(e)
+
+    exercicio.play(soI) 
     jkp.play( soI, None, 3 )
 
-
-    soI.say("Agora vou te mostrar minhas habilidades como ator. Primeiro mostre cada uma das emocoes contidas no papel que te entregaram, na ordem que preferir. Diga Ok robo quanto estiver pronto")
-    raw_input("Press enter to start emotion recognition")
-
-    attention = disattention.Th(1)
-    attention.start()
-
-    soI.emotions()
-    #emo.play(soI, attention)
-    attention._end_classification()
+    playActor(soI)
 
     if prefferences:
-        soI.say( musica )
+        try:
+            soI.say( u'\nSobre sua música preferida: \n{}'.format(
+                userModel.searchFile([preferences['musica favorita'].encode('utf-8')])).encode('utf-8') )
+        except Exception as e:
+            print(e)
 
-
-
-    soI.say("Então é isso. Foi um prazer interagir com você, "+ nome +" . Espero te ver em breve. Até mais.")
+    soI.say('Então é isso. Foi um prazer interagir com você, '+ nome)
+    soI.say('Espero te ver em breve. Até mais.')
     
 
 if __name__=="__main__":
